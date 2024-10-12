@@ -1,0 +1,28 @@
+<!-- app/templates/admin/dashboard.html -->
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Tableau de bord{% endblock %}
+
+{% block header %}Tableau de bord{% endblock %}
+
+{% block content %}
+<h2>Ventes de tickets</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID du ticket</th>
+            <th>Email utilisateur</th>
+            <th>Date d'achat</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in sales_data %}
+        <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.owner.email }}</td>
+            <td>{{ ticket.date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

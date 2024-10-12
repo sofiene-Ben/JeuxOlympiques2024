@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Détails de l'Offre{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ offre.name }}</h1>
+    <p><strong>Description :</strong> {{ offre.description }}</p>
+    <p><strong>Prix :</strong> {{ offre.price }} €</p>
+    <p><strong>Type :</strong> {{ offre.type }}</p>
+
+    <hr>
+
+    <form action="{{ url_for('main.add_to_cart', offer_id=offre.id) }}" method="post">
+        <button type="submit">Ajouter au panier</button>
+    </form>
+
+
+    <div class="navigation">
+        <a href="{{ url_for('main.panier') }}" class="btn btn-secondary">Voir le Panier</a>
+        <a href="{{ url_for('main.offers') }}" class="btn btn-secondary">Retour aux Offres</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!-- app/templates/base.html -->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Jeux Olympiques 2024{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <a href="{{ url_for('main.home') }}">Accueil</a>
+            <a href="{{ url_for('main.offers') }}">Offres</a>
+            <a href="{{ url_for('main.panier') }}">Panier</a>
+            {% if current_user.is_authenticated %}
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+            {% endif %}
+            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
+            <a href="{{ url_for('main.profile') }}">Profil</a>
+            <span style="color:beige">Bienvenue, {{ current_user.firstname }} {{ current_user.lastname }}</span>
+            {% else %}
+            <a href="{{ url_for('auth.login') }}">Connexion</a>
+            <a href="{{ url_for('auth.register') }}">Inscription</a>
+            {% endif %}
+
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jeux Olympiques à Paris</p>
+    </footer>
+</body>
+
+</html>

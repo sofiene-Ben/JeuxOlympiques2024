@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription{% endblock %}
+{% block content %}
+
+<main>
+    <h2>Liste des Offres</h2>
+
+    {% if offers %}
+    <div class="offres-container">
+        {% for offre in offers %}
+        <div class="offre-item">
+            <h3>{{ offre.name }}</h3>
+            <p>{{ offre.description }}</p>
+            <p>Prix : {{ offre.price }} €</p>
+            <p>Type : {{ offre.type }}</p>
+
+            <!-- Lien pour ajouter l'offre au panier -->
+            <form action="{{ url_for('main.add_to_cart', offer_id=offre.id) }}" method="post">
+                <button type="submit">Ajouter au panier</button>
+            </form>
+
+            <!-- Lien pour voir les détails d'une offre -->
+            <a href="{{ url_for('main.details_offre', offer_id=offre.id) }}" class="details-link">Détails</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>Aucune offre disponible pour le moment.</p>
+    {% endif %}
+</main>
+
+{% endblock %}

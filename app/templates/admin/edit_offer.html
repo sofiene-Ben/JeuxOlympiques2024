@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Modifier l'Offre{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Modifier l'Offre: {{ offer.name }}</h1>
+    <form method="POST" action="{{ url_for('admin.update_offer', offer_id=offer.id) }}">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.name.label(class="form-label") }}
+            {{ form.name(class="form-control", value=offer.name) }}
+            {% for error in form.name.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", value=offer.description) }}
+            {% for error in form.description.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="form-group">
+            {{ form.price.label(class="form-label") }}
+            {{ form.price(class="form-control", value=offer.price) }}
+            {% for error in form.price.errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Modifier l'Offre</button>
+        <a href="{{ url_for('admin.manage_offers') }}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
