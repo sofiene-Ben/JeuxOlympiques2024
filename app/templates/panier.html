@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Mon Panier{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Mon Panier</h1>
+
+    {% if panier and panier|length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Offre</th>
+                <th scope="col">Prix</th>
+                <th scope="col">Quantité</th>
+                <th scope="col">Total</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in panier %}
+
+            <tr>
+                <td>{{ item }}</td>
+                <td>{{ panier[item].price }} €</td>
+                <td>{{ panier[item].quantite }} </td>
+                <td>{{ panier[item].quantite*panier[item].price }} </td>
+
+                <td>
+                    <form action="{{ url_for('main.update_panier', offre_id=item) }}" method="POST">
+                        <button type="submit" name="quantite" class="btn btn-sm btn-primary">+</button>
+                        <button type="submit" name="quantite" class="btn btn-sm btn-primary">-</button>
+                    </form>
+                    <form action="{{ url_for('main.remove_from_panier', offre_id=item) }}" method="POST">
+                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
+
+
+            </tr>
+
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Total : {{ total }} €</h3>
+
+    {% else %}
+    <p>Aucune offre dans le panier pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}

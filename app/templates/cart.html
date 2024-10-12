@@ -1,0 +1,22 @@
+<!-- app/templates/cart.html -->
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Panier</title>
+</head>
+
+<body>
+    <h1>Mon Panier</h1>
+    <ul>
+        {% for item in cart %}
+        <li>Offre ID : {{ item }}</li>
+        {% endfor %}
+    </ul>
+    <form action="{{ url_for('checkout') }}" method="post">
+        <button type="submit">Finaliser la Commande</button>
+    </form>
+</body>
+
+</html>
