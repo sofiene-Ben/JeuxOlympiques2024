@@ -1,16 +1,29 @@
 <!-- app/templates/ticket.html -->
-<!DOCTYPE html>
-<html lang="fr">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Mon e-Ticket</title>
-</head>
+{% extends "base.html" %}
 
-<body>
-    <h1>Mon e-Ticket</h1>
-    <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code">
-    <p>Montrez ce QR code à l'entrée.</p>
-</body>
+{% block title %}Mes e-Tickets{% endblock %}
 
-</html>
+{% block content %}
+
+<div class="container">
+    {% if image_data %}
+        <div class="offres-container">
+            {% for ticket in image_data %}
+                <div class="offre-item">
+                    <img src="data:image/png;base64,{{ ticket.encoded_data }}" alt="QR Code Ticket {{ ticket.id }}">
+                    <p><strong>Ticket ID:</strong> {{ ticket.id }}</p>
+                    <p><strong>Achat le:</strong> {{ ticket.date.strftime('%d/%m/%Y') }} à {{ ticket.date.strftime('%H:%M:%S') }}</p>
+                    <p><strong>Offre:</strong> {{ ticket.offer_name }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Aucun ticket disponible.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+    <!-- <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code">
+    <p>Montrez ce QR code à l'entrée.</p> -->

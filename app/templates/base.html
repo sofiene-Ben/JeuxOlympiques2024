@@ -6,6 +6,9 @@
     <meta charset="UTF-8">
     <title>{% block title %}Jeux Olympiques 2024{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -17,6 +20,9 @@
             {% if current_user.is_authenticated %}
             {% if current_user.is_admin %}
             <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+            {% endif %}
+            {% if current_user.is_admin == false %}
+            <a href="{{ url_for('main.ticket') }}">Vos Tickets</a>
             {% endif %}
             <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
             <a href="{{ url_for('main.profile') }}">Profil</a>
@@ -37,5 +43,5 @@
         <p>&copy; 2024 Jeux Olympiques à Paris</p>
     </footer>
 </body>
-
+<script src="../static/js/cart.js"></script>
 </html>
