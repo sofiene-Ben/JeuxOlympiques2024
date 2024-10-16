@@ -4,4 +4,29 @@
 {% block content %}
 <h1>Profil de l'utilisateur</h1>
 <p>Bienvenue sur votre page de profil.</p>
+
+{% if user %}
+<table>
+    <tbody>
+
+        <tr>
+            <td>Nom</td> <td>{{ user.firstname }}</td>
+        </tr>
+        <tr>
+            <td>prenom</td> <td>{{ user.lastname }}</td>
+        </tr>
+        <tr>
+            <td>email</td> <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <td>password</td> <td>**********</td>
+        </tr>
+
+    </tbody>
+</table>
+
+<a href="{{ url_for('main.update_profile') }}" class="btn btn-secondary">Modifier le profil</a>
+<a href="{{ url_for('main.change_password') }}" class="btn btn-warning">Changer le mot de passe</a>
+
+{% endif %}
 {% endblock %}

@@ -6,14 +6,110 @@
     <meta charset="UTF-8">
     <title>Jeux Olympiques 2024</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="../static/css/swiper.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
 </head>
 
+
 <body>
+
+
     {% extends "base.html" %}
+    {% block header %}
+    {% include "header.html" %}
+    {% endblock %}
 
     {% block content %}
-    <h1>Bienvenue aux Jeux Olympiques de 2024 à Paris!</h1>
-    <p>Découvrez les différentes épreuves et réservez vos tickets dès maintenant.</p>
+    <h1>Bienvenue aux Jeux Olympiques de 2024 à Paris!</h1> 
+
+
+    <section>
+
+        <p>
+            Bienvenue aux Jeux Olympiques de Paris 2024, un événement qui rassemble les meilleurs athlètes du monde pour
+            célébrer l’excellence, l’endurance et l’esprit sportif. Cette édition, marquée par un cadre exceptionnel au
+            cœur de la ville des Lumières, promet des moments de compétition inoubliables, mêlant tradition olympique et
+            innovation moderne.
+
+        </p>
+
+        <h3>
+            Un Événement Planétaire
+        </h3>
+
+        <p>
+            Depuis leur première édition moderne en 1896, les Jeux Olympiques sont devenus le plus grand rassemblement
+            sportif mondial, incarnant les valeurs de respect, de solidarité et d’égalité. Paris, ville hôte des Jeux
+            pour la troisième fois de son histoire, se prépare à offrir un spectacle unique, où l’excitation des
+            épreuves sportives se mariera à la beauté architecturale et culturelle de la capitale française.
+
+            Les spectateurs du monde entier auront l’occasion de vivre cet événement grandiose en direct, dans des sites
+            emblématiques comme le Stade de France, le Grand Palais, ou encore au pied de la Tour Eiffel. Chaque lieu a
+            été soigneusement choisi pour mettre en valeur la beauté de Paris tout en offrant des installations modernes
+            et accessibles à tous.
+        </p>
+
+        {% include "swiper.html" %}
+
+        <h3>
+            Les Épreuves Olympiques : Un Tourbillon d’Émotion
+        </h3>
+
+        <ol>
+            Les Jeux Olympiques de Paris 2024 accueilleront un vaste éventail d’épreuves sportives, chacune mettant en
+            lumière le talent, la force et la détermination des athlètes. Voici quelques-unes des compétitions phares à
+            ne pas manquer :
+
+            <li>
+                Athlétisme : Discipline reine des Jeux Olympiques, l’athlétisme comprend des courses, des sauts et des
+                lancers, où les athlètes se mesurent dans des épreuves telles que le 100 mètres, le saut en longueur, ou
+                encore le lancer de javelot. Que ce soit sur la piste ou sur le terrain, chaque compétition est une
+                démonstration de vitesse, de puissance et de technique.
+            </li>
+
+            <li>
+                Natation : Au cœur du Centre Aquatique Olympique, les épreuves de natation verront s’affronter les
+                nageurs
+                les plus rapides du monde, dans des courses palpitantes comme le 100 mètres nage libre, le 200 mètres
+                papillon, ou le relais 4 x 100 mètres. Plongez dans une ambiance électrique, où chaque course se joue en
+                quelques fractions de seconde.
+            </li>
+
+            <li>
+                Gymnastique Artistique : Discipline synonyme de grâce et de précision, la gymnastique artistique se
+                déroulera dans l’éblouissant Accor Arena. Les athlètes présenteront leurs enchaînements sur les agrès,
+                en
+                réalisant des figures acrobatiques qui défient la gravité. Les épreuves comme le saut de cheval, les
+                barres
+                asymétriques ou la poutre sont des démonstrations de souplesse, de force et de maîtrise.
+            </li>
+
+
+            <li> Basketball : Le tournoi olympique de basketball se tiendra dans un cadre spectaculaire au Parc des
+                Expositions. Les équipes du monde entier rivaliseront pour la médaille d’or, offrant des matchs intenses
+                et
+                rythmés. Assistez à des dunks spectaculaires, des passes décisives et des moments de stratégie qui font
+                de
+                chaque rencontre un véritable spectacle.
+            </li>
+            <li> Escrime : Discipline historique et incontournable des Jeux, l’escrime se déroulera au majestueux Grand
+                Palais. Avec ses combats au fleuret, à l’épée ou au sabre, l’escrime incarne l’élégance et l’agilité,
+                chaque
+                duel étant un affrontement de vitesse et de tactique. Un hommage aux racines françaises de ce sport
+                noble.
+            </li>
+
+            <li> Sports Nautiques : Le cadre unique de la Seine accueillera des épreuves spectaculaires de canoë-kayak
+                et de
+                voile, où les athlètes se mesureront aux éléments en quête de l’or. Ces épreuves combinent technique,
+                force
+                et une profonde connexion avec la nature.
+            </li>
+
+        </ol>
+
+    </section>
     {% endblock %}
 </body>
 

@@ -14,6 +14,8 @@
             <th>Titre</th>
             <th>Description</th>
             <th>Prix</th>
+            <th>Stock</th>
+            <th>Stripe Price ID</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -24,6 +26,9 @@
             <td>{{ offer.name }}</td>
             <td>{{ offer.description }}</td>
             <td>{{ offer.price }}</td>
+            <td>{{ offer.stock }}</td>
+            <td>{{ offer.stripe_price_id }}</td>
+
             <td>
                 <a href="{{ url_for('admin.edit_offer', offer_id=offer.id) }}">Modifier</a> |
                 <a href="{{ url_for('admin.delete_offer', offer_id=offer.id) }}"

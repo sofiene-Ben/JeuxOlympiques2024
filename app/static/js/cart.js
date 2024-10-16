@@ -160,56 +160,56 @@ function getCsrfToken() {
 //         .catch(error => console.error('Erreur:', error));
 //     });
 // });
-function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-}
+// function debounce(func, delay) {
+//     let timeout;
+//     return function(...args) {
+//         const context = this;
+//         clearTimeout(timeout);
+//         timeout = setTimeout(() => func.apply(context, args), delay);
+//     };
+// }
 
-document.querySelectorAll('.update-panier-form').forEach(form => {
-    form.addEventListener('click', debounce((event) => {
-        if (event.target.classList.contains('update-cart')) {
-            event.preventDefault(); // Empêche le comportement par défaut du bouton
+// document.querySelectorAll('.update-panier-form').forEach(form => {
+//     form.addEventListener('click', debounce((event) => {
+//         if (event.target.classList.contains('update-cart')) {
+//             event.preventDefault(); // Empêche le comportement par défaut du bouton
             
-            console.log('Bouton cliqué'); // Log pour vérifier si l'événement se déclenche
+//             console.log('Bouton cliqué'); // Log pour vérifier si l'événement se déclenche
 
-            const itemId = form.querySelector('input[name="item_id"]').value;
-            const action = event.target.getAttribute('data-action'); // Récupérer l'action
+//             const itemId = form.querySelector('input[name="item_id"]').value;
+//             const action = event.target.getAttribute('data-action'); // Récupérer l'action
 
-            // Effectuer une requête AJAX pour mettre à jour le panier
-            fetch(`/update_panier/${itemId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': form.querySelector('input[name="csrf_token"]').value
-                },
-                body: new URLSearchParams({ action: action }) // Envoie l'action en tant que paramètre de formulaire
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erreur réseau');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Réponse du serveur:', data); // Log pour vérifier la réponse du serveur
-                if (data.success) {
-                    // Mettre à jour la quantité dans le DOM si besoin
-                    // alert(data.message || 'Aucun message fourni');
-                    document.getElementById(`quantite-${itemId}`).textContent = data.newQuantity;
-                    document.getElementById(`total-${itemId}`).textContent = data.total;
+//             // Effectuer une requête AJAX pour mettre à jour le panier
+//             fetch(`/update_panier/${itemId}`, {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/x-www-form-urlencoded',
+//                     'X-CSRFToken': form.querySelector('input[name="csrf_token"]').value
+//                 },
+//                 body: new URLSearchParams({ action: action }) // Envoie l'action en tant que paramètre de formulaire
+//             })
+//             .then(response => {
+//                 if (!response.ok) {
+//                     throw new Error('Erreur réseau');
+//                 }
+//                 return response.json();
+//             })
+//             .then(data => {
+//                 console.log('Réponse du serveur:', data); // Log pour vérifier la réponse du serveur
+//                 if (data.success) {
+//                     // Mettre à jour la quantité dans le DOM si besoin
+//                     // alert(data.message || 'Aucun message fourni');
+//                     document.getElementById(`quantite-${itemId}`).textContent = data.newQuantity;
+//                     document.getElementById(`total-${itemId}`).textContent = data.total;
 
-                } else {
-                    alert('Erreur : ' + data.message); // Afficher un message d'erreur
-                }
-            })
-            .catch(error => console.error('Erreur:', error));
-        }
-    }, 300)); // Utilisation d'un debounce pour limiter les appels
-});
+//                 } else {
+//                     alert('Erreur : ' + data.message); // Afficher un message d'erreur
+//                 }
+//             })
+//             .catch(error => console.error('Erreur:', error));
+//         }
+//     }, 300)); // Utilisation d'un debounce pour limiter les appels
+// });
 
 
 
