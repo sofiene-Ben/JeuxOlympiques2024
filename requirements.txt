@@ -13,3 +13,5 @@ PyMySQL==1.0.2
 Pillow
 stripe
 flask-wtf
+Flask-Mail
+itsdangerous

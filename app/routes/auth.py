@@ -60,6 +60,7 @@ def login():
         else:
             flash('Adresse e-mail non trouvée.', 'danger')
     else:
+        form.email.data = request.form.get('email')
         print("Validation échouée lors de la connexion")  # Débogage
         for field, errors in form.errors.items():
             for error in errors:

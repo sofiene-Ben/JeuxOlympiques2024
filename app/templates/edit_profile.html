@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Modifier Profil{% endblock %}
+
+{% block content %}
+{% if user %}
+<h1>Modifier votre profil</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}  <!-- CSRF token -->
+    
+    <div class="form-group">
+        <label for="firstname">Prénom</label>
+        {{ form.firstname(class="form-control", id="firstname") }}
+    </div>
+
+    <div class="form-group">
+        <label for="lastname">Nom</label>
+        {{ form.lastname(class="form-control", id="lastname") }}
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        {{ form.email(class="form-control", id="email") }}
+    </div>
+
+    <div class="form-group">
+        {{ form.submit(class="btn btn-primary") }}
+    </div>
+</form>
+
+{% endif %}
+{% endblock %}
+

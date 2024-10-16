@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
-from app.models import Offer, Ticket, db
+from app.models import Offer, Ticket, User, db
 from flask_login import login_required, current_user
 import os
 import qrcode
@@ -8,6 +8,10 @@ from flask import session
 from pprint import pprint
 import base64
 import stripe
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.forms import UpdateProfileForm, ChangePasswordForm, ResetPasswordRequestForm, ResetPasswordForm
+from flask_mail import Message
+from app import mail
 
 stripe.api_key = 'sk_test_51Q9MqRP78S9tzF5jAVOMzkwNFuYEdOKE7dKEe5OMehFgmh4bSEDMThoX9OFsN3bfnSIHwknpuzN9VgKTbufEhims00Wsn2WJXQ'
 
@@ -27,6 +31,7 @@ def add_to_panier(offre_id, quantite):
         panier[str(offre_id)] = {'quantite': int(quantite)}
         panier[str(offre_id)]['name']=offres[offre_id].name
         panier[str(offre_id)]['price']=offres[offre_id].price
+        panier[str(offre_id)]['stripe_price_id']=offres[offre_id].stripe_price_id
     session['panier'] = panier
 
 
@@ -92,13 +97,14 @@ def panier():
     print(offres)
     panier = get_panier()
     #offres = {offre.id: offre for offre in Offer.query.all()}  # Charger toutes les offres
-    
     total = calculer_total(panier, offres)
     print(panier)
     for item in offres:
         print(offres[item].name)
+        print(offres[item].stripe_price_id)
+
     #session.clear()
-    return render_template('panier.html', panier=panier, total=total)
+    return render_template('panier.html', panier=panier, total=total, offres=offres)
 
 # @main_bp.route('/add_to_cart/<int:offer_id>', methods=['POST'])
 # def add_to_cart(offer_id):
@@ -174,27 +180,27 @@ def update_panier(offre_id):
     return jsonify({'success': True, 'message': 'Quantité mise à jour avec succès.', 'total': total_par_offre, 'newQuantity': panier.get(str(offre_id), {}).get('quantite', 0)})
 
 
-# @main_bp.route('/remove_from_panier/<int:offre_id>', methods=['POST'])
-# def remove_from_panier(offre_id):
-#     panier = session.get('panier', {})
-#     del panier[str(offre_id)]
-#     session['panier'] = panier
-
-#     # Rediriger vers la page du panier
-#     return redirect(url_for('main.panier'))
-
 @main_bp.route('/remove_from_panier/<int:offre_id>', methods=['POST'])
 def remove_from_panier(offre_id):
     panier = session.get('panier', {})
-    if str(offre_id) in panier:
-        del panier[str(offre_id)]
+    del panier[str(offre_id)]
     session['panier'] = panier
-    total_items = sum(item['quantite'] for item in panier.values())
-    response = {
-        'success': True,
-        'total_items': total_items
-    }
-    return jsonify(response), 200
+
+    # Rediriger vers la page du panier
+    return redirect(url_for('main.panier'))
+
+# @main_bp.route('/remove_from_panier/<int:offre_id>', methods=['POST'])
+# def remove_from_panier(offre_id):
+#     panier = session.get('panier', {})
+#     if str(offre_id) in panier:
+#         del panier[str(offre_id)]
+#     session['panier'] = panier
+#     total_items = sum(item['quantite'] for item in panier.values())
+#     response = {
+#         'success': True,
+#         'total_items': total_items
+#     }
+#     return jsonify(response), 200
 
 ###################################################################################################
 ###################################################################################################
@@ -202,50 +208,104 @@ def remove_from_panier(offre_id):
 ######################## -----  Booking & Payment  ----- ##########################################
 
 
+# @main_bp.route('/purchase', methods=['GET', 'POST'])
+# @login_required
+# def purchase():
+#     """
+# Gère le processus d'achat pour les utilisateurs.
+
+# Cette fonction permet aux utilisateurs d'initier un paiement via Stripe,
+# de générer des QR codes et de créer des tickets basés sur les offres dans leur panier.
+
+# Méthodes :
+#     GET : Affiche le formulaire d'achat et initie le paiement.
+#     POST : Gère les requêtes de paiement (si implémenté).
+
+# Returns:
+#     Redirect vers la page de paiement Stripe ou affiche une erreur si le panier est vide.
+
+# Raises:
+#     Exception : En cas d'erreur lors de la création de la session de paiement.
+# """
+        
+#     # Récupérer le panier
+#     panier = get_panier()
+#     if not panier:
+#         return "Votre panier est vide."
+
+#     # Récupérer l'offre depuis le panier
+#     offer_id = list(panier.keys())[0]
+#     offer_details = panier[offer_id]
+#     quantity = offer_details['quantite'] 
+#     price = offer_details['stripe_price_id']
+
+#     # Récupérer l'offre
+#     offer = Offer.query.get_or_404(offer_id)
+
+#     # Créer la session de paiement Stripe
+#     try:
+#         checkout_session = stripe.checkout.Session.create(
+#             line_items=[
+#                 {
+#                     'price': price,  # Remplacer par le bon Price ID
+#                     'quantity': quantity,
+#                 },
+#             ],
+#             mode='payment',
+#             success_url=url_for('main.success', _external=True)+ '?session_id={CHECKOUT_SESSION_ID}',
+#             cancel_url=url_for('main.cancel', _external=True)
+#         )
+#     except Exception as e:
+#         return str(e)
+
+#     # Rediriger vers la page de paiement Stripe
+#     return redirect(checkout_session.url, code=303)
+
 @main_bp.route('/purchase', methods=['GET', 'POST'])
 @login_required
 def purchase():
     """
-Gère le processus d'achat pour les utilisateurs.
+    Gère le processus d'achat pour les utilisateurs.
 
-Cette fonction permet aux utilisateurs d'initier un paiement via Stripe,
-de générer des QR codes et de créer des tickets basés sur les offres dans leur panier.
+    Cette fonction permet aux utilisateurs d'initier un paiement via Stripe,
+    de générer des QR codes et de créer des tickets basés sur les offres dans leur panier.
 
-Méthodes :
-    GET : Affiche le formulaire d'achat et initie le paiement.
-    POST : Gère les requêtes de paiement (si implémenté).
+    Méthodes :
+        GET : Affiche le formulaire d'achat et initie le paiement.
+        POST : Gère les requêtes de paiement (si implémenté).
 
-Returns:
-    Redirect vers la page de paiement Stripe ou affiche une erreur si le panier est vide.
+    Returns:
+        Redirect vers la page de paiement Stripe ou affiche une erreur si le panier est vide.
 
-Raises:
-    Exception : En cas d'erreur lors de la création de la session de paiement.
-"""
+    Raises:
+        Exception : En cas d'erreur lors de la création de la session de paiement.
+    """
         
     # Récupérer le panier
     panier = get_panier()
     if not panier:
         return "Votre panier est vide."
 
-    # Récupérer l'offre depuis le panier
-    offer_id = list(panier.keys())[0]
-    offer_details = panier[offer_id]
-    quantity = offer_details['quantite'] 
+    # Créer les éléments de la ligne pour chaque offre dans le panier
+    line_items = []
+    for offer_id, offer_details in panier.items():
+        quantity = offer_details['quantite']
+        price = offer_details['stripe_price_id']
+        line_items.append({
+            'price': price,
+            'quantity': quantity,
+        })
 
-    # Récupérer l'offre
-    offer = Offer.query.get_or_404(offer_id)
+    # Vérifier s'il y a des items à acheter
+    if not line_items:
+        return "Votre panier est vide."
 
     # Créer la session de paiement Stripe
     try:
         checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price': 'price_1Q9MsCP78S9tzF5jaml3JRCV',  # Remplacer par le bon Price ID
-                    'quantity': quantity,
-                },
-            ],
+            line_items=line_items,
             mode='payment',
-            success_url=url_for('main.success', _external=True)+ '?session_id={CHECKOUT_SESSION_ID}',
+            success_url=url_for('main.success', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
             cancel_url=url_for('main.cancel', _external=True)
         )
     except Exception as e:
@@ -353,5 +413,115 @@ def ticket():
 ######################## -----  User Settings  ----- ##########################################
 @main_bp.route('/profile')
 def profile():
-    # logiques du profil
-    return render_template('profile.html')
+    # recuperer l'ID de l'utilisateur connecté dans la session
+    user_id = current_user.id
+
+    # Si l'utilisateur est connecté, récupérez ses informations de la base de données
+    if user_id:
+        user = User.query.get(user_id)  # Récupérer l'utilisateur de la base de données
+        if user:
+            return render_template('profile.html', user=user)
+        else:
+            return "Utilisateur non trouvé", 404
+    else:
+        return "Veuillez vous connecter pour accéder à votre profil", 401
+    
+
+@main_bp.route('/edit-profile', methods=['GET', 'POST'])
+def update_profile():
+    user_id = current_user.id
+
+    if not user_id:
+        return "Veuillez vous connecter pour accéder à cette page", 401
+
+    user = User.query.get(user_id)
+
+    if not user:
+        return "Utilisateur non trouvé", 404
+
+    form = UpdateProfileForm(obj=user)
+
+    if form.validate_on_submit():
+        user.firstname = form.firstname.data
+        user.lastname = form.lastname.data
+        user.email = form.email.data
+        db.session.commit()
+        flash("Profil mis à jour avec succès")
+        return redirect(url_for('main.profile'))
+
+    return render_template('edit_profile.html', user=user, form=form)
+
+
+@main_bp.route('/change-password', methods=['GET', 'POST'])
+def change_password():
+    user_id = current_user.id
+    user = User.query.get(user_id)
+
+    if not user:
+        return "Utilisateur non trouvé", 404
+
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        # Vérification et mise à jour du mot de passe
+        if check_password_hash(user.password_hash, form.current_password.data):
+            user.password_hash = generate_password_hash(form.new_password.data)
+            db.session.commit()
+            flash("Mot de passe mis à jour avec succès.")
+            return redirect(url_for('main.profile'))
+        else:
+            flash("Le mot de passe actuel est incorrect.")
+
+    return render_template('change_password.html', user=user, form=form)
+
+
+@main_bp.route('/reset-password-request', methods=['GET', 'POST'])
+def reset_password_request():
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            # Créer un token de réinitialisation
+            token = user.get_reset_password_token()  # Assurez-vous d'implémenter cette méthode dans votre modèle User
+            send_reset_email(user.email, token)
+            flash('Un email de réinitialisation a été envoyé.', 'info')
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Aucun utilisateur trouvé avec cette adresse e-mail.', 'danger')
+    
+    return render_template('reset_password_request.html', form=form)
+
+def send_reset_email(email, token):
+    msg = Message('Réinitialisation du mot de passe',
+                  sender='olympic.studi@gmail.com',
+                  recipients=[email])
+    msg.body = f'''Pour réinitialiser votre mot de passe, visitez le lien suivant :
+{url_for('main.reset_password', token=token, _external=True)}
+Si vous n'avez pas demandé de réinitialisation, ignorez cet email.
+'''
+    mail.send(msg)
+
+
+@main_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    user = User.verify_reset_password_token(token)  # Implémentez cette méthode pour vérifier le token
+    if not user:
+        flash('Le lien de réinitialisation est invalide ou a expiré.', 'danger')
+        return redirect(url_for('auth.login'))
+
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.new_password.data)
+        db.session.commit()
+        flash('Votre mot de passe a été mis à jour.', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template('reset_password.html', form=form, token=token)
+
+
+@main_bp.route('/test-email')
+def test_email():
+    msg = Message('Test Email', recipients=['destinataire@example.com'])
+    msg.body = 'Ceci est un e-mail de test.'
+    mail.send(msg)
+    return 'E-mail envoyé!'

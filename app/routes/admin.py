@@ -12,6 +12,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for
 from flask_login import login_required, current_user
 from functools import wraps
 from app.models import Offer, Ticket  # Assurez-vous que ces modèles existent
+# from app.models import OfferType
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -84,11 +85,21 @@ def manage_offers():
 def create_offer():
     form = OfferForm()
     if form.validate_on_submit():
+        # # Vérifier que l'ID du type d'offre existe dans la table offer_type
+        # offer_type_id = int(form.offer_type.data)
+        # offer_type = OfferType.query.get(offer_type_id)
+        
+        # if not offer_type:
+        #     flash('Type d\'offre invalide.', 'danger')
+        #     return redirect(url_for('admin.create_offer'))
+        
         offer = Offer(
             name=form.name.data,
             description=form.description.data,
             price=form.price.data,
-            # type=form.type.data  # Assurez-vous que cela n'est pas None
+            # type_id=offer_type_id,  # Utilisation correcte de l'ID du type d'offre
+            stock=form.stock.data,
+            stripe_price_id=form.stripe_price_id.data,
         )
         db.session.add(offer)
         db.session.commit()
