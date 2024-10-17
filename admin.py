@@ -16,9 +16,11 @@ with app.app_context():
             lastname="User",
             email="admin@example.com",
             key=uuid.uuid4().hex,
-            is_admin=True  # Définir l'utilisateur comme administrateur
+            is_admin=True,  # Définir l'utilisateur comme administrateur
+            is_staff=True  # Définir l'utilisateur comme administrateur
+
         )
-        admin.set_password("AdminPassword123")
+        admin.set_password("AdminPassword123@")
         db.session.add(admin)
         db.session.commit()
         print("Administrateur créé avec succès.")

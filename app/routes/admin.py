@@ -25,6 +25,22 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def staff_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not hasattr(current_user, 'is_staff') or not current_user.is_staff:
+            flash('Accès interdit : administrateur uniquement.', 'danger')
+            return redirect(url_for('main.home'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@admin_bp.route('/staff')
+@login_required
+@staff_required
+def staff():
+    return render_template('admin/staff.html')
+
 @admin_bp.route('/dashboard')
 @login_required
 @admin_required

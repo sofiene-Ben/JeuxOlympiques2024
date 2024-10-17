@@ -1,0 +1,54 @@
+<!-- app/templates/conditions.html -->
+{% extends "base.html" %}
+
+{% block title %}Conditions d'Utilisation{% endblock %}
+
+{% block content %}
+<h1>Conditions d'Utilisation</h1>
+<p>Dernière mise à jour : {{ update_date }}</p>
+
+<p>Bienvenue sur notre plateforme de billetterie en ligne pour les Jeux Olympiques. En utilisant notre site, vous acceptez les présentes conditions d'utilisation. Veuillez les lire attentivement avant de procéder à votre achat.</p>
+
+<h2>1. Objet</h2>
+<p>Notre plateforme permet aux utilisateurs d'acheter des billets pour assister aux événements des Jeux Olympiques. Ces conditions d'utilisation régissent l'accès et l'utilisation de notre site, ainsi que l'achat des billets disponibles.</p>
+
+<h2>2. Données Personnelles</h2>
+<p>Conformément au Règlement Général sur la Protection des Données (RGPD), nous nous engageons à protéger la confidentialité des données personnelles que vous fournissez lors de votre inscription et de l'achat de billets. Les données collectées incluent, sans s'y limiter : votre nom, prénom, adresse email, et informations de paiement.</p>
+
+<h3>2.1 Utilisation des Données</h3>
+<ul>
+    <li>Les données personnelles collectées sont utilisées uniquement dans le cadre de la gestion des achats de billets et de la communication avec les utilisateurs concernant leurs commandes.</li>
+    <li>Vos données ne seront jamais partagées avec des tiers sans votre consentement préalable, sauf lorsque cela est nécessaire pour le traitement de votre commande (par exemple, pour l'utilisation de services de paiement sécurisés).</li>
+</ul>
+
+<h3>2.2 Droits de l'Utilisateur</h3>
+<p>En conformité avec le RGPD, vous avez le droit de :</p>
+<ul>
+    <li>Accéder à vos données personnelles et en demander une copie.</li>
+    <li>Rectifier vos données si elles sont inexactes ou incomplètes.</li>
+    <li>Demander l'effacement de vos données personnelles, sous réserve des obligations légales de conservation.</li>
+    <li>Vous opposer au traitement de vos données personnelles ou en demander la limitation.</li>
+    <li>Demander la portabilité de vos données vers un autre prestataire.</li>
+</ul>
+<p>Pour exercer ces droits, veuillez nous contacter à l'adresse suivante : <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<h2>3. Achat de Billets</h2>
+<p>Les billets achetés sur notre plateforme sont nominatifs et ne peuvent être transférés ou revendus sans autorisation préalable. Toute violation de cette règle entraînera l'annulation des billets sans remboursement.</p>
+
+<h2>4. Politique de Remboursement</h2>
+<p>Les billets ne sont pas remboursables, sauf en cas d'annulation de l'événement par l'organisateur. Dans un tel cas, vous serez informé par email des modalités de remboursement.</p>
+
+<h2>5. Sécurité des Transactions</h2>
+<p>Nous utilisons des technologies de cryptage pour garantir la sécurité des transactions sur notre site. Toutes les informations de paiement sont traitées de manière sécurisée via des prestataires de services de paiement certifiés.</p>
+
+<h2>6. Responsabilité</h2>
+<p>Nous déclinons toute responsabilité en cas de perte ou de vol de billets après leur envoi électronique. Il est de votre responsabilité de conserver vos billets en lieu sûr et de ne pas les partager avec des tiers non autorisés.</p>
+
+<h2>7. Modifications des Conditions d'Utilisation</h2>
+<p>Nous nous réservons le droit de modifier ces conditions d'utilisation à tout moment. Toute modification sera notifiée aux utilisateurs via notre site web. La poursuite de l'utilisation du site après modification implique votre acceptation des nouvelles conditions.</p>
+
+<h2>8. Contact</h2>
+<p>Pour toute question concernant ces conditions d'utilisation ou vos droits en tant qu'utilisateur, veuillez contacter notre support à l'adresse suivante : <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<p>En cochant la case "J'accepte les Conditions d'Utilisation" lors de l'inscription ou de l'achat d'un billet, vous acceptez ces conditions dans leur intégralité.</p>
+{% endblock %}

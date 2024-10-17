@@ -3,7 +3,7 @@
 {% block title %}Inscription{% endblock %}
 {% block content %}
 
-<main>
+<main class="offres-main">
     <h2>Liste des Offres</h2>
 
     {% if offers %}
@@ -11,20 +11,12 @@
         {% for offre in offers %}
         <div class="offre-item">
             <h3>{{ offre.name }}</h3>
-            <p>{{ offre.description }}</p>
+            <p class="offre-description">{{ offre.description }}</p>
             <p>Prix : {{ offre.price }} €</p>
-            <p>Type : {{ offre.type }}</p>
-            <p>id : {{ offre.id }}</p>
-
-
-            <!-- Lien pour ajouter l'offre au panier -->
-            <form action="{{ url_for('main.add_to_cart', offer_id=offre.id) }}" method="post" >
+            <form action="{{ url_for('main.add_to_cart', offer_id=offre.id) }}" method="post">
                 <button type="submit" class="add-to-cart-button" data-offer-id="{{ offre.id }}">Ajouter au panier</button>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             </form>
-
-            <!-- Lien pour voir les détails d'une offre -->
-            <a href="{{ url_for('main.details_offre', offer_id=offre.id) }}" class="details-link">Détails</a>
         </div>
         {% endfor %}
     </div>
