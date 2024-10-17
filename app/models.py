@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     key = db.Column(db.String(128), unique=True, nullable=False, default=lambda: uuid.uuid4().hex)
     is_admin = db.Column(db.Boolean, default=False)  # Champ pour administrateurs
+    is_staff = db.Column(db.Boolean, default=False)  # Champ pour employer
     tickets = db.relationship('Ticket', backref='owner', lazy=True)
 
     def set_password(self, password):

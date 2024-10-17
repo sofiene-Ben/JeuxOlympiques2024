@@ -25,6 +25,7 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         EqualTo('password', message='Les mots de passe doivent correspondre.')
     ])
+    accept_terms = BooleanField('J\'accepte les Conditions d\'utilisation', validators=[])
     submit = SubmitField('S\'inscrire')
 
     def validate_email(self, email):

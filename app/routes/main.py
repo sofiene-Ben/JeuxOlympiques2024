@@ -525,3 +525,13 @@ def test_email():
     msg.body = 'Ceci est un e-mail de test.'
     mail.send(msg)
     return 'E-mail envoyé!'
+
+
+@main_bp.route('/conditions')
+def conditions():
+    return render_template('conditions.html', update_date="15 octobre 2024", support_email="olympic.studi@gmail.com")
+
+@main_bp.route('/add/<int:a>/<int:b>')
+def add(a, b):
+    return str(a+b)
+

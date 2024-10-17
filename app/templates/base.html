@@ -13,6 +13,7 @@
 
 <body>
     <header>
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div> <!-- Bouton Toggle -->
         <nav>
             <a href="{{ url_for('main.home') }}">Accueil</a>
             <a href="{{ url_for('main.offers') }}">Offres</a>
@@ -24,16 +25,15 @@
             {% if current_user.is_admin == false %}
             <a href="{{ url_for('main.ticket') }}">Vos Tickets</a>
             {% endif %}
-            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
             <a href="{{ url_for('main.profile') }}">Profil</a>
-            <span style="color:beige">Bienvenue, {{ current_user.firstname }} {{ current_user.lastname }}</span>
+            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
             {% else %}
             <a href="{{ url_for('auth.login') }}">Connexion</a>
             <a href="{{ url_for('auth.register') }}">Inscription</a>
             {% endif %}
-
         </nav>
     </header>
+    
         {% block header %}{% endblock %}
     <main>
         {% block content %}{% endblock %}
@@ -44,4 +44,5 @@
     </footer>
 </body>
 <script src="../static/js/cart.js"></script>
+<script src="../static/js/main.js"></script>
 </html>

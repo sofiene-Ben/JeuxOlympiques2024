@@ -6,27 +6,31 @@
 <p>Bienvenue sur votre page de profil.</p>
 
 {% if user %}
-<table>
+<table class="user-info">
     <tbody>
-
         <tr>
-            <td>Nom</td> <td>{{ user.firstname }}</td>
+            <td>Nom</td>
+            <td>{{ user.firstname }}</td>
         </tr>
         <tr>
-            <td>prenom</td> <td>{{ user.lastname }}</td>
+            <td>Prénom</td>
+            <td>{{ user.lastname }}</td>
         </tr>
         <tr>
-            <td>email</td> <td>{{ user.email }}</td>
+            <td>Email</td>
+            <td>{{ user.email }}</td>
         </tr>
         <tr>
-            <td>password</td> <td>**********</td>
+            <td>Mot de passe</td>
+            <td>
+                <span>**********</span>
+                <button class="btn btn-warning btn-blue" onclick=redirectToEditPassword()>Modifier</button>
+            </td>
         </tr>
-
     </tbody>
 </table>
 
-<a href="{{ url_for('main.update_profile') }}" class="btn btn-secondary">Modifier le profil</a>
-<a href="{{ url_for('main.change_password') }}" class="btn btn-warning">Changer le mot de passe</a>
+<button class="btn btn-secondary btn-blue" onclick=redirectToEditProfile()>Modifier le profil</button>
 
 {% endif %}
 {% endblock %}

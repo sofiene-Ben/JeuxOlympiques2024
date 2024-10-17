@@ -18,6 +18,10 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        if not form.accept_terms.data:
+            flash("Vous devez accepter les conditions d'utilisation pour continuer.", 'danger')
+            return redirect(url_for('auth.register'))
+        
         print("Formulaire validé")  # Débogage
         user = User(
             firstname=form.firstname.data,
@@ -56,9 +60,9 @@ def login():
                 flash('Connexion réussie !', 'success')
                 return redirect(url_for('main.home'))
             else:
-                flash('Mot de passe incorrect.', 'danger')
+                flash('Mot de passe ou Adresse e-mail incorrect.', 'danger')
         else:
-            flash('Adresse e-mail non trouvée.', 'danger')
+            flash('Mot de passe ou Adresse e-mail incorrect.', 'danger')
     else:
         form.email.data = request.form.get('email')
         print("Validation échouée lors de la connexion")  # Débogage
