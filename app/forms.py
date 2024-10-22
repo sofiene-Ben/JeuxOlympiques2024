@@ -110,12 +110,14 @@ class OfferEditForm(FlaskForm):
     price = DecimalField('Price', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     # type = SelectField('Type', choices=[('type1', 'Type 1'), ('type2', 'Type 2')], validators=[DataRequired()])
+    stock = IntegerField('Stock', validators=[DataRequired()])
+    stripe_price_id = StringField('Stripe Price ID', validators=[DataRequired()])
     submit = SubmitField('Create Offer')
 class UserEditForm(FlaskForm):
     firstname = StringField('Prénom', validators=[DataRequired(), Length(min=2, max=64)])
     lastname = StringField('Nom', validators=[DataRequired(), Length(min=2, max=64)])
     email = StringField('Adresse e-mail', validators=[DataRequired(), Email(), Length(max=120)])
-    is_admin = BooleanField('Administrateur')
+    is_staff = BooleanField('Staff')
     submit = SubmitField('Mettre à jour')    
 
 

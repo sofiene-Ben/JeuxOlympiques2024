@@ -2,12 +2,13 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app.models import User, db
 from flask_login import login_user, logout_user, login_required
 from app.forms import RegistrationForm, LoginForm
-from wtforms import StringField, PasswordField, SubmitField
-from werkzeug.security import generate_password_hash
-import os
+# from wtforms import StringField, PasswordField, SubmitField
+# from werkzeug.security import generate_password_hash
+# import os
 import uuid
-from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Email, Length
+# from flask_wtf import FlaskForm
+# from wtforms.validators import DataRequired, Email, Length
+import time 
 auth_bp = Blueprint('auth', __name__)
 
 
@@ -51,6 +52,7 @@ def register():
 def login():
     form = LoginForm()
     if form.validate_on_submit():
+        time.sleep(2)
         print("Formulaire de connexion validé")  # Débogage
         user = User.query.filter_by(email=form.email.data).first()
         if user:

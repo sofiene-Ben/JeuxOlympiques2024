@@ -1,18 +1,9 @@
-# app/routes/admin.py
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from functools import wraps
-from app.models import User, db
-from app.models import Offer, Ticket
-from app.forms import OfferForm,UserEditForm,OfferEditForm # Assurez-vous d'avoir un formulaire pour les offres
-admin_bp = Blueprint('admin', __name__)
+from app.models import User, db, Offer, Ticket
+from app.forms import OfferForm, UserEditForm, OfferEditForm  # Assurez-vous d'avoir un formulaire pour les offres
 
-# app/routes/admin.py
-from flask import Blueprint, render_template, flash, redirect, url_for
-from flask_login import login_required, current_user
-from functools import wraps
-from app.models import Offer, Ticket  # Assurez-vous que ces modèles existent
-# from app.models import OfferType
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -67,7 +58,7 @@ def edit_user(user_id):
         user.firstname = form.firstname.data
         user.lastname = form.lastname.data
         user.email = form.email.data
-        user.is_admin = form.is_admin.data
+        user.is_staff = form.is_staff.data
         db.session.commit()
         flash('Utilisateur mis à jour avec succès.', 'success')
         return redirect(url_for('admin.manage_users'))
@@ -88,7 +79,7 @@ def delete_user(user_id):
 
 
 
-@admin_bp.route('/admin/manage_offers')
+@admin_bp.route('admin/manage_offers')
 @login_required
 @admin_required
 def manage_offers():
@@ -119,7 +110,7 @@ def create_offer():
         )
         db.session.add(offer)
         db.session.commit()
-        flash('Offre créée avec succès!', 'success')
+        flash('Offre cree avec succes!', 'success')
         return redirect(url_for('admin.manage_offers'))
     return render_template('admin/create_offer.html', form=form)
 
@@ -134,8 +125,10 @@ def edit_offer(offer_id):
         offer.name = form.name.data
         offer.description = form.description.data
         offer.price = form.price.data
+        offer.stock = form.stock.data
+        offer.stripe_price_id = form.stripe_price_id.data
         db.session.commit()
-        flash('Offre mise à jour avec succès!', 'success')
+        flash('Offre mise a jour avec succès!', 'success')
         return redirect(url_for('admin.manage_offers'))
     return render_template('admin/edit_offer.html', form=form, offer=offer)
 
@@ -149,6 +142,8 @@ def update_offer(offer_id):
         offer.description = form.description.data
         offer.price = form.price.data
         # offer.type = form.type.data  # Assurez-vous que le champ type existe dans le formulaire
+        offer.stock = form.stock.data
+        offer.stripe_price_id = form.stripe_price_id.data
         
         db.session.commit()
         return redirect(url_for('admin.manage_offers'))  # Redirige vers la liste des offres

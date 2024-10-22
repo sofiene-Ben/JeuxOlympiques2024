@@ -5,15 +5,16 @@ import os
 import qrcode
 from io import BytesIO
 from flask import session
-from pprint import pprint
+# from pprint import pprint
 import base64
 import stripe
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.forms import UpdateProfileForm, ChangePasswordForm, ResetPasswordRequestForm, ResetPasswordForm
 from flask_mail import Message
 from app import mail
+from app import Config
 
-stripe.api_key = 'sk_test_51Q9MqRP78S9tzF5jAVOMzkwNFuYEdOKE7dKEe5OMehFgmh4bSEDMThoX9OFsN3bfnSIHwknpuzN9VgKTbufEhims00Wsn2WJXQ'
+stripe.api_key = Config.STRIPE_API_KEY  # Charger la clé API depuis la configuration
 
 main_bp = Blueprint('main', __name__)
 
@@ -26,7 +27,7 @@ def add_to_panier(offre_id, quantite):
         panier[str(offre_id)]['quantite'] += int(quantite)
         
     else:
-        offres = {offre.id: offre for offre in Offer.query.all()}  # Remplacez `Offre` par le nom de votre modèle
+        offres = {offre.id: offre for offre in Offer.query.all()} 
     
         panier[str(offre_id)] = {'quantite': int(quantite)}
         panier[str(offre_id)]['name']=offres[offre_id].name
@@ -59,12 +60,12 @@ def calculer_total(panier, offres):
     return total
 
 
-# Supprimer une offre du panier
-def remove_from_panier(offre_id):
-    panier = session.get('panier', {})
-    if offre_id in panier:
-        del panier[offre_id]
-        session['panier'] = panier
+# # Supprimer une offre du panier
+# def remove_from_panier(offre_id):
+#     panier = session.get('panier', {})
+#     if offre_id in panier:
+#         del panier[offre_id]
+#         session['panier'] = panier
 
 ######################## -----  Home  ----- ##########################################
 @main_bp.route('/')
@@ -80,12 +81,6 @@ def offers():
     offers = Offer.query.all()  # Récupérer toutes les offres
     return render_template('offres.html',offers=offers)
 
-@main_bp.route('/details_offre/<int:offer_id>')
-def details_offre(offer_id):
-    # Rechercher l'offre dans la base de données avec offer_id
-    offer = Offer.query.get_or_404(offer_id)
-    return render_template('details_offre.html', offre=offer)
-
 ######################################################################################
 ######################################################################################
 
@@ -93,30 +88,32 @@ def details_offre(offer_id):
 @main_bp.route('/panier')
 def panier():
     
-    offres = {offre.id: offre for offre in Offer.query.all()}  # Remplacez `Offre` par le nom de votre modèle
-    print(offres)
+    offres = {offre.id: offre for offre in Offer.query.all()} 
+    # print(offres)
     panier = get_panier()
     #offres = {offre.id: offre for offre in Offer.query.all()}  # Charger toutes les offres
     total = calculer_total(panier, offres)
-    print(panier)
-    for item in offres:
-        print(offres[item].name)
-        print(offres[item].stripe_price_id)
+    # print("Contenu du panier :", panier)  # Débogage
+    # for item in offres:
+    #     print(offres[item].name)
+    #     print(offres[item].stripe_price_id)
 
     #session.clear()
     return render_template('panier.html', panier=panier, total=total, offres=offres)
 
-# @main_bp.route('/add_to_cart/<int:offer_id>', methods=['POST'])
-# def add_to_cart(offer_id):
-#     add_to_panier(offer_id,1)
-#     # Ajouter l'offre au panier de l'utilisateur (à implémenter)
-#     print('Offre ajoutée au panier!', 'success')
-#     return {'success': True, 'message': 'Offre ajoutée au panier!'}
-
-# ############ test add cart
 
 @main_bp.route('/add_to_cart/<int:offer_id>', methods=['POST'])
 def add_to_cart(offer_id):
+
+    # Rechercher l'offre dans la base de données en utilisant SQLAlchemy
+    offer = Offer.query.get(offer_id)
+    
+    if offer is None:
+        response = {
+            'success': False,
+            'message': 'Offre introuvable.'
+        }
+        return jsonify(response), 404
     add_to_panier(offer_id, 1)  # Ajouter l'offre au panier de l'utilisateur
     response = {
         'success': True,
@@ -189,81 +186,10 @@ def remove_from_panier(offre_id):
     # Rediriger vers la page du panier
     return redirect(url_for('main.panier'))
 
-# @main_bp.route('/remove_from_panier/<int:offre_id>', methods=['POST'])
-# def remove_from_panier(offre_id):
-#     panier = session.get('panier', {})
-#     if str(offre_id) in panier:
-#         del panier[str(offre_id)]
-#     session['panier'] = panier
-#     total_items = sum(item['quantite'] for item in panier.values())
-#     response = {
-#         'success': True,
-#         'total_items': total_items
-#     }
-#     return jsonify(response), 200
-
 ###################################################################################################
 ###################################################################################################
 
 ######################## -----  Booking & Payment  ----- ##########################################
-
-
-# @main_bp.route('/purchase', methods=['GET', 'POST'])
-# @login_required
-# def purchase():
-#     """
-# Gère le processus d'achat pour les utilisateurs.
-
-# Cette fonction permet aux utilisateurs d'initier un paiement via Stripe,
-# de générer des QR codes et de créer des tickets basés sur les offres dans leur panier.
-
-# Méthodes :
-#     GET : Affiche le formulaire d'achat et initie le paiement.
-#     POST : Gère les requêtes de paiement (si implémenté).
-
-# Returns:
-#     Redirect vers la page de paiement Stripe ou affiche une erreur si le panier est vide.
-
-# Raises:
-#     Exception : En cas d'erreur lors de la création de la session de paiement.
-# """
-        
-#     # Récupérer le panier
-#     panier = get_panier()
-#     if not panier:
-#         return "Votre panier est vide."
-
-#     # Récupérer l'offre depuis le panier
-#     offer_id = list(panier.keys())[0]
-#     offer_details = panier[offer_id]
-#     quantity = offer_details['quantite'] 
-#     price = offer_details['stripe_price_id']
-
-#     # Récupérer l'offre
-#     offer = Offer.query.get_or_404(offer_id)
-
-#     # Créer la session de paiement Stripe
-#     try:
-#         checkout_session = stripe.checkout.Session.create(
-#             line_items=[
-#                 {
-#                     'price': price,  # Remplacer par le bon Price ID
-#                     'quantity': quantity,
-#                 },
-#             ],
-#             mode='payment',
-#             success_url=url_for('main.success', _external=True)+ '?session_id={CHECKOUT_SESSION_ID}',
-#             cancel_url=url_for('main.cancel', _external=True)
-#         )
-#     except Exception as e:
-#         return str(e)
-
-#     # Rediriger vers la page de paiement Stripe
-#     return redirect(checkout_session.url, code=303)
-
-@main_bp.route('/purchase', methods=['GET', 'POST'])
-@login_required
-def purchase():
     """
     Gère le processus d'achat pour les utilisateurs.
 
@@ -281,6 +207,10 @@ def purchase():
         Exception : En cas d'erreur lors de la création de la session de paiement.
     """
         
+@main_bp.route('/purchase', methods=['GET', 'POST'])
+@login_required
+def purchase():
+
     # Récupérer le panier
     panier = get_panier()
     if not panier:
@@ -323,7 +253,8 @@ def success():
     session_id = request.args.get('session_id')
     try:
         session = stripe.checkout.Session.retrieve(session_id)
-        if session.payment_status != 'paid':
+        # if session.payment_status != 'paid':
+        if session['payment_status'] != 'paid':
             return "Le paiement n'a pas été validé."
     except Exception as e:
         return str(e)
@@ -401,8 +332,6 @@ def ticket():
                 'date': ticket.created_at,
                 'offer_name': offer.name if offer else "Offre inconnue",
                 'encoded_data': encoded_data,
-                # Ajoute d'autres informations si nécessaire (par ex. date, type de ticket, etc.)
-                # 'event': ticket.event_name  # Exemple d'une autre info à afficher
             })
 
     return render_template('ticket.html', image_data=ticket_data, offers=offers)
@@ -482,7 +411,7 @@ def reset_password_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             # Créer un token de réinitialisation
-            token = user.get_reset_password_token()  # Assurez-vous d'implémenter cette méthode dans votre modèle User
+            token = user.get_reset_password_token() 
             send_reset_email(user.email, token)
             flash('Un email de réinitialisation a été envoyé.', 'info')
             return redirect(url_for('auth.login'))
@@ -504,7 +433,7 @@ Si vous n'avez pas demandé de réinitialisation, ignorez cet email.
 
 @main_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    user = User.verify_reset_password_token(token)  # Implémentez cette méthode pour vérifier le token
+    user = User.verify_reset_password_token(token) 
     if not user:
         flash('Le lien de réinitialisation est invalide ou a expiré.', 'danger')
         return redirect(url_for('auth.login'))
@@ -514,24 +443,14 @@ def reset_password(token):
         user.set_password(form.new_password.data)
         db.session.commit()
         flash('Votre mot de passe a été mis à jour.', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('auth.login'))
 
     return render_template('reset_password.html', form=form, token=token)
 
-
-@main_bp.route('/test-email')
-def test_email():
-    msg = Message('Test Email', recipients=['destinataire@example.com'])
-    msg.body = 'Ceci est un e-mail de test.'
-    mail.send(msg)
-    return 'E-mail envoyé!'
 
 
 @main_bp.route('/conditions')
 def conditions():
     return render_template('conditions.html', update_date="15 octobre 2024", support_email="olympic.studi@gmail.com")
 
-@main_bp.route('/add/<int:a>/<int:b>')
-def add(a, b):
-    return str(a+b)
 

@@ -16,3 +16,4 @@ flask-wtf
 Flask-Mail
 itsdangerous
 pytest
+coverage
